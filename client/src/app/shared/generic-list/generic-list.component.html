@@ -1,0 +1,24 @@
+<h2>{{ title }}</h2>
+
+<table  *ngIf="items.length > 0; else noData">
+  <tr>
+    <th *ngFor="let col of columns">
+      {{ col.label }}
+    </th>
+    <th>פעולות</th>
+  </tr>
+
+  <tr *ngFor="let item of items" (click)="selectRow(item)" style="cursor: pointer;">
+    <td *ngFor="let col of columns">
+      {{ item[col.key] }}
+    </td>
+    <td>
+      <button type="button" (click)="onView(item, $event)">צפייה</button>
+      <button type="button" (click)="onEdit(item, $event)">עריכה</button>
+    </td>
+  </tr>
+</table>
+
+<ng-template #noData>
+  <p>אין נתונים להצגה</p>
+</ng-template>

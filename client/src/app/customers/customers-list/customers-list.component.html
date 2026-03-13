@@ -1,0 +1,31 @@
+<div style="margin-bottom: 1rem; display: flex; gap: 0.75rem; align-items: center; flex-wrap: wrap;">
+  <input
+    type="text"
+    [(ngModel)]="searchText"
+    placeholder="חיפוש לפי Title/Name"
+    aria-label="חיפוש לפי Title או Name">
+
+  <button type="button" (click)="addCustomer()">הוספה</button>
+</div>
+
+<app-generic-list
+  [title]="'רשימת לקוחות'"
+  [items]="filteredCustomers"
+  [columns]="columns"
+  (rowClick)="viewCustomer($event)"
+  (viewClick)="viewCustomer($event)"
+  (editClick)="editCustomer($event)">
+</app-generic-list>
+
+<ng-container *ngIf="formMode">
+  <app-generic-form
+    [title]="formMode === 'new' ? 'לקוח חדש' : formMode === 'view' ? 'צפייה בלקוח' : 'ערוך לקוח'"
+    [fields]="formFields"
+    [data]="selectedCustomer"
+    [procedureName]="formProcedureName"
+    [mode]="formMode"
+    (saved)="onFormSaved($event)"
+    (canceled)="onFormCanceled()"
+    (edit)="editCustomer(selectedCustomer)">
+  </app-generic-form>
+</ng-container>

@@ -1,0 +1,28 @@
+<h2>{{title}}</h2>
+
+<form [formGroup]="form">
+  <div *ngFor="let field of fields">
+    <label>{{field.label}}</label>
+
+    <ng-container *ngIf="field.type === 'select'; else textField">
+      <select [formControlName]="field.key">
+        <option [ngValue]="null">בחר...</option>
+        <option *ngFor="let option of field.options || []" [ngValue]="option.value">
+          {{ option.label }}
+        </option>
+      </select>
+    </ng-container>
+
+    <ng-template #textField>
+      <input
+        [formControlName]="field.key"
+        type="text">
+    </ng-template>
+  </div>
+
+  <div style="margin-top: 1rem; display: flex; gap: 1rem;">
+    <button type="button" (click)="save()" [hidden]="mode === 'view'">Save</button>
+    <button type="button" (click)="cancel()">Cancel</button>
+    <button type="button" (click)="startEdit()" *ngIf="mode === 'view'">Edit</button>
+  </div>
+</form>

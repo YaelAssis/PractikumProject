@@ -1,0 +1,192 @@
+import { Component, OnInit } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
+import { catchError, map, Observable, of } from 'rxjs';
+import { ApiService } from '../../services/api.service';
+import { GenericListComponent } from '../../shared/generic-list/generic-list.component';
+import { GenericFormComponent } from '../../shared/generic-form/generic-form.component';
+
+@Component({
+  selector: 'app-customers-list',
+  standalone: true,
+  imports: [CommonModule, FormsModule, GenericListComponent, GenericFormComponent],
+  templateUrl: './customers-list.component.html',
+  styleUrls: ['./customers-list.component.css']
+})
+export class CustomersListComponent implements OnInit {
+
+  customers: any[] = [];
+  searchText: string = '';
+  cityOptions: Array<{ value: any; label: string }> = [];
+  statusOptions: Array<{ value: any; label: string }> = [];
+
+  columns = [
+    { key: 'Id', label: 'מזהה' },
+    { key: 'FullName', label: 'שם מלא' },
+    { key: 'Phone', label: 'טלפון' },
+    { key: 'Email', label: 'אימייל' },
+    { key: 'CityName', label: 'עיר' },
+    { key: 'StatusName', label: 'סטטוס' }
+  ];
+
+  formMode: 'view' | 'edit' | 'new' | null = null;
+  selectedCustomer: any = null;
+
+  detailFields = [
+    { key: 'Id', label: 'מזהה' },
+    { key: 'FullName', label: 'שם מלא' },
+    { key: 'Phone', label: 'טלפון' },
+    { key: 'Email', label: 'אימייל' },
+    { key: 'CityName', label: 'עיר' },
+    { key: 'StatusName', label: 'סטטוס' }
+  ];
+
+  constructor(private api: ApiService) {}
+
+  ngOnInit(): void {
+    this.loadLookups();
+    this.loadCustomers();
+  }
+
+  get formFields() {
+    if (this.formMode === 'view') {
+      return this.detailFields;
+    }
+
+    return [
+      { key: 'FullName', label: 'שם מלא', required: true },
+      { key: 'Phone', label: 'טלפון' },
+      { key: 'Email', label: 'אימייל' },
+      { key: 'CityId', label: 'עיר', type: 'select', options: this.cityOptions, required: true },
+      { key: 'StatusId', label: 'סטטוס', type: 'select', options: this.statusOptions, required: true, paramKey: '@StatusId' }
+    ];
+  }
+
+  private normalizeResultSet(data: any): any[] {
+    if (Array.isArray(data)) {
+      return data;
+    }
+
+    if (data?.resultSets?.length > 0) {
+      return data.resultSets[0];
+    }
+
+    return [];
+  }
+
+  private loadLookupWithFallback(procedureNames: string[]): Observable<any[]> {
+    if (!procedureNames.length) {
+      return of([]);
+    }
+
+    const [currentProcedure, ...restProcedures] = procedureNames;
+
+    return this.api.execute(currentProcedure, {}).pipe(
+      map((data: any) => this.normalizeResultSet(data)),
+      catchError(() => this.loadLookupWithFallback(restProcedures))
+    );
+  }
+
+  private mapOptions(items: any[], idCandidates: string[], nameCandidates: string[]): Array<{ value: any; label: string }> {
+    return items
+      .map((item: any) => {
+        const valueKey = idCandidates.find((key) => item[key] !== undefined && item[key] !== null) || 'Id';
+        const labelKey = nameCandidates.find((key) => item[key] !== undefined && item[key] !== null) || 'Name';
+        return { value: item[valueKey], label: String(item[labelKey] ?? item[valueKey] ?? '') };
+      })
+      .filter((option) => option.value !== undefined && option.value !== null && option.label !== '');
+  }
+
+  loadLookups() {
+    this.loadLookupWithFallback(['Cities_GetAll', 'City_GetAll']).subscribe((cities: any[]) => {
+      this.cityOptions = this.mapOptions(cities, ['Id', 'CityId'], ['Name', 'CityName', 'Title']);
+    });
+
+    this.loadLookupWithFallback(['CustomerStatuses_GetAll', 'CustomerStatus_GetAll']).subscribe((statuses: any[]) => {
+      this.statusOptions = this.mapOptions(statuses, ['Id', 'StatusId'], ['Name', 'StatusName', 'Title']);
+    });
+  }
+
+  loadCustomers() {
+    // שלחתי מחרוזת ריקה במקום null כדי שהחיפוש יעבוד תמיד
+    this.api.execute('Customers_GetAll', { Search: '' }) 
+      .subscribe((data: any) => {
+        this.customers = this.normalizeResultSet(data);
+      });
+  }
+
+  get filteredCustomers(): any[] {
+    const query = this.searchText.trim().toLowerCase();
+
+    if (!query) {
+      return this.customers;
+    }
+
+    return this.customers.filter((customer: any) => {
+      const nameValue = (customer.Name ?? customer.FullName ?? '').toString().toLowerCase();
+      const titleValue = (customer.Title ?? '').toString().toLowerCase();
+
+      return nameValue.includes(query) || titleValue.includes(query);
+    });
+  }
+
+  get formProcedureName(): string {
+    return this.formMode === 'edit' ? 'Customers_Update' : 'Customers_Create';
+  }
+
+  private mapNameToId(name: string | undefined, options: Array<{ value: any; label: string }>): any {
+    if (!name) {
+      return null;
+    }
+
+    const match = options.find((option) => option.label === name);
+    return match ? match.value : null;
+  }
+
+  private prepareCustomerForEdit(customer: any): any {
+    const customerForEdit = { ...customer };
+
+    if (customerForEdit.CityId === undefined || customerForEdit.CityId === null) {
+      customerForEdit.CityId = this.mapNameToId(customerForEdit.CityName, this.cityOptions);
+    }
+
+    if (customerForEdit.StatusId === undefined || customerForEdit.StatusId === null) {
+      customerForEdit.StatusId = this.mapNameToId(customerForEdit.StatusName, this.statusOptions);
+    }
+
+    return customerForEdit;
+  }
+
+  addCustomer() {
+    this.selectedCustomer = {
+      FullName: '',
+      Phone: '',
+      Email: '',
+      CityId: null,
+      StatusId: null
+    };
+    this.formMode = 'new';
+  }
+
+  viewCustomer(customer: any) {
+    this.selectedCustomer = { ...customer };
+    this.formMode = 'view';
+  }
+
+  editCustomer(customer: any) {
+    this.selectedCustomer = this.prepareCustomerForEdit(customer);
+    this.formMode = 'edit';
+  }
+
+  onFormSaved(event: any) {
+    // event contains { mode, data, result } from GenericFormComponent
+    this.loadCustomers();
+    this.formMode = null;
+    this.selectedCustomer = null;
+  }
+
+  onFormCanceled() {
+    this.formMode = null;
+    this.selectedCustomer = null;
+  }
+}
