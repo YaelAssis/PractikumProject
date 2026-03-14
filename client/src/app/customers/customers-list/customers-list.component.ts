@@ -41,6 +41,14 @@ export class CustomersListComponent implements OnInit {
     { key: 'StatusName', label: 'סטטוס' }
   ];
 
+  editFields = [
+    { key: 'FullName', label: 'שם מלא', required: true },
+    { key: 'Phone', label: 'טלפון' },
+    { key: 'Email', label: 'אימייל' },
+    { key: 'CityId', label: 'עיר', type: 'select', options: this.cityOptions, required: true },
+    { key: 'StatusId', label: 'סטטוס', type: 'select', options: this.statusOptions, required: true }
+  ];
+
   constructor(private api: ApiService) {}
 
   ngOnInit(): void {
@@ -53,13 +61,19 @@ export class CustomersListComponent implements OnInit {
       return this.detailFields;
     }
 
-    return [
-      { key: 'FullName', label: 'שם מלא', required: true },
-      { key: 'Phone', label: 'טלפון' },
-      { key: 'Email', label: 'אימייל' },
-      { key: 'CityId', label: 'עיר', type: 'select', options: this.cityOptions, required: true },
-      { key: 'StatusId', label: 'סטטוס', type: 'select', options: this.statusOptions, required: true, paramKey: '@StatusId' }
-    ];
+    return this.editFields;
+  }
+
+  private updateEditFieldOptions(): void {
+    const cityField = this.editFields.find((field: any) => field.key === 'CityId');
+    if (cityField) {
+      cityField.options = this.cityOptions;
+    }
+
+    const statusField = this.editFields.find((field: any) => field.key === 'StatusId');
+    if (statusField) {
+      statusField.options = this.statusOptions;
+    }
   }
 
   private normalizeResultSet(data: any): any[] {
@@ -100,10 +114,12 @@ export class CustomersListComponent implements OnInit {
   loadLookups() {
     this.loadLookupWithFallback(['Cities_GetAll', 'City_GetAll']).subscribe((cities: any[]) => {
       this.cityOptions = this.mapOptions(cities, ['Id', 'CityId'], ['Name', 'CityName', 'Title']);
+      this.updateEditFieldOptions();
     });
 
     this.loadLookupWithFallback(['CustomerStatuses_GetAll', 'CustomerStatus_GetAll']).subscribe((statuses: any[]) => {
       this.statusOptions = this.mapOptions(statuses, ['Id', 'StatusId'], ['Name', 'StatusName', 'Title']);
+      this.updateEditFieldOptions();
     });
   }
 
