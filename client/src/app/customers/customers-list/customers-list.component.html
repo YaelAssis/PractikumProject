@@ -1,31 +1,52 @@
-<div style="margin-bottom: 1rem; display: flex; gap: 0.75rem; align-items: center; flex-wrap: wrap;">
-  <input
-    type="text"
-    [(ngModel)]="searchText"
-    placeholder="חיפוש לפי Title/Name"
-    aria-label="חיפוש לפי Title או Name">
+<section class="customers-page">
+  <header class="customers-page__header">
+    <div class="customers-page__title-block">
+      <span class="customers-page__eyebrow">CRM SYSTEM</span>
+      <h1>רשימת לקוחות</h1>
+      <p>
+        צפייה, חיפוש וניהול של כל הלקוחות במערכת בצורה מסודרת, ברורה ונוחה.
+      </p>
+    </div>
 
-  <button type="button" (click)="addCustomer()">הוספה</button>
-</div>
+    <button type="button" class="customers-page__add-btn" (click)="addCustomer()">
+      הוספה
+    </button>
+  </header>
 
-<app-generic-list
-  [title]="'רשימת לקוחות'"
-  [items]="filteredCustomers"
-  [columns]="columns"
-  (rowClick)="viewCustomer($event)"
-  (viewClick)="viewCustomer($event)"
-  (editClick)="editCustomer($event)">
-</app-generic-list>
+  <section class="customers-toolbar">
+    <div class="customers-search">
+      <span class="customers-search__icon">⌕</span>
+      <input
+        type="text"
+        [(ngModel)]="searchText"
+        placeholder="חיפוש לפי שם / טלפון / אימייל"
+        aria-label="חיפוש לפי שם / טלפון / אימייל" />
+    </div>
+  </section>
 
-<ng-container *ngIf="formMode">
-  <app-generic-form
-    [title]="formMode === 'new' ? 'לקוח חדש' : formMode === 'view' ? 'צפייה בלקוח' : 'ערוך לקוח'"
-    [fields]="formFields"
-    [data]="selectedCustomer"
-    [procedureName]="formProcedureName"
-    [mode]="formMode"
-    (saved)="onFormSaved($event)"
-    (canceled)="onFormCanceled()"
-    (edit)="editCustomer(selectedCustomer)">
-  </app-generic-form>
-</ng-container>
+  <section class="customers-list-card">
+    <app-generic-list
+      [title]="'רשימת לקוחות'"
+      [items]="filteredCustomers"
+      [columns]="columns"
+      (rowClick)="viewCustomer($event)"
+      (viewClick)="viewCustomer($event)"
+      (editClick)="editCustomer($event)">
+    </app-generic-list>
+  </section>
+
+  <ng-container *ngIf="formMode">
+    <section class="customers-form-card">
+      <app-generic-form
+        [title]="formMode === 'new' ? 'לקוח חדש' : formMode === 'view' ? 'צפייה בלקוח' : 'ערוך לקוח'"
+        [fields]="formFields"
+        [data]="selectedCustomer"
+        [procedureName]="formProcedureName"
+        [mode]="formMode"
+        (saved)="onFormSaved($event)"
+        (canceled)="onFormCanceled()"
+        (edit)="editCustomer(selectedCustomer)">
+      </app-generic-form>
+    </section>
+  </ng-container>
+</section>

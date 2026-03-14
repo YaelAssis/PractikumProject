@@ -1,0 +1,221 @@
+:host {
+  display: block;
+}
+
+.customers-page {
+  min-height: 100vh;
+  padding: 3rem 2rem 4rem;
+  direction: rtl;
+  text-align: right;
+  background: #f6f7f9;
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+.customers-page__header {
+  max-width: 1300px;
+  margin: 0 auto 2rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  gap: 1.5rem;
+}
+
+.customers-page__title-block {
+  max-width: 800px;
+}
+
+.customers-page__eyebrow {
+  display: inline-block;
+  margin-bottom: 0.75rem;
+  color: #7daed1;
+  font-size: 0.95rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+}
+
+.customers-page__header h1 {
+  margin: 0;
+  font-size: 2.5rem;
+  font-weight: 700;
+  color: #77b7df;
+  line-height: 1.2;
+}
+
+.customers-page__header p {
+  margin: 0.9rem 0 0;
+  font-size: 1.05rem;
+  line-height: 1.9;
+  color: #7a7a7a;
+}
+
+.customers-page__add-btn {
+  border: none;
+  background: #77b7df;
+  color: #ffffff;
+  border-radius: 999px;
+  padding: 0.95rem 1.8rem;
+  font-size: 1rem;
+  font-weight: 700;
+  cursor: pointer;
+  box-shadow: 0 10px 22px rgba(119, 183, 223, 0.28);
+  transition: 0.2s ease;
+  white-space: nowrap;
+}
+
+.customers-page__add-btn:hover {
+  transform: translateY(-2px);
+  background: #66abd8;
+}
+
+.customers-toolbar {
+  max-width: 1300px;
+  margin: 0 auto 1.5rem;
+}
+
+.customers-search {
+  position: relative;
+  max-width: 420px;
+}
+
+.customers-search__icon {
+  position: absolute;
+  top: 50%;
+  right: 1rem;
+  transform: translateY(-50%);
+  color: #9aa4af;
+  font-size: 1.1rem;
+  pointer-events: none;
+}
+
+.customers-search input {
+  width: 100%;
+  height: 54px;
+  border-radius: 999px;
+  border: 1px solid #dde4ea;
+  background: #ffffff;
+  padding: 0 3rem 0 1.2rem;
+  font-size: 1rem;
+  color: #4b5563;
+  outline: none;
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.04);
+  transition: 0.2s ease;
+}
+
+.customers-search input:focus {
+  border-color: #77b7df;
+  box-shadow: 0 0 0 4px rgba(119, 183, 223, 0.12);
+}
+
+.customers-list-card,
+.customers-form-card {
+  max-width: 1300px;
+  margin: 0 auto;
+  background: #ffffff;
+  border-radius: 28px;
+  border: 1px solid #e7ecf1;
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.05);
+  overflow: hidden;
+}
+
+.customers-list-card {
+  padding: 1.25rem;
+}
+
+.customers-form-card {
+  margin-top: 2rem;
+  padding: 1.5rem;
+}
+
+/* ריווח פנימי כללי ל-generic-list ול-generic-form */
+.customers-list-card app-generic-list,
+.customers-form-card app-generic-form {
+  display: block;
+}
+
+/* כותרות פנימיות אם יש */
+.customers-list-card ::ng-deep h2,
+.customers-list-card ::ng-deep h3,
+.customers-form-card ::ng-deep h2,
+.customers-form-card ::ng-deep h3 {
+  color: #73b6df;
+  margin-top: 0;
+}
+
+/* עיצוב כללי לטפסים פנימיים */
+.customers-form-card ::ng-deep form {
+  display: grid;
+  gap: 1rem;
+}
+
+.customers-form-card ::ng-deep label {
+  font-weight: 700;
+  color: #6e7b87;
+}
+
+.customers-form-card ::ng-deep input,
+.customers-form-card ::ng-deep select,
+.customers-form-card ::ng-deep textarea {
+  width: 100%;
+  min-height: 48px;
+  border-radius: 14px;
+  border: 1px solid #dfe6ec;
+  background: #ffffff;
+  padding: 0.8rem 1rem;
+  font-size: 0.98rem;
+  color: #4b5563;
+  outline: none;
+  transition: 0.2s ease;
+  box-sizing: border-box;
+}
+
+.customers-form-card ::ng-deep textarea {
+  min-height: 110px;
+  resize: vertical;
+}
+
+.customers-form-card ::ng-deep input:focus,
+.customers-form-card ::ng-deep select:focus,
+.customers-form-card ::ng-deep textarea:focus {
+  border-color: #77b7df;
+  box-shadow: 0 0 0 4px rgba(119, 183, 223, 0.12);
+}
+
+/* כפתורים פנימיים */
+.customers-form-card ::ng-deep button {
+  border: none;
+  border-radius: 999px;
+  padding: 0.8rem 1.4rem;
+  font-size: 0.95rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: 0.2s ease;
+}
+
+/* רספונסיביות */
+@media (max-width: 900px) {
+  .customers-page {
+    padding: 2rem 1rem 3rem;
+  }
+
+  .customers-page__header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .customers-page__header h1 {
+    font-size: 2rem;
+  }
+
+  .customers-page__header p {
+    font-size: 1rem;
+  }
+
+  .customers-search {
+    max-width: 100%;
+  }
+
+  .customers-list-card,
+  .customers-form-card {
+    border-radius: 22px;
+  }
+}

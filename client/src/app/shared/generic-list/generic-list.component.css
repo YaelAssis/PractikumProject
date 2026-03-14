@@ -1,0 +1,81 @@
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 1rem;
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+h2 {
+  color: #73b6df;
+  margin-bottom: 1rem;
+}
+
+th {
+  background: #f3f7fa;
+  color: #73b6df;
+  text-align: right;
+  padding: 12px;
+  font-weight: 700;
+  border-bottom: 2px solid #e3e9ee;
+}
+
+td {
+  padding: 12px;
+  border-bottom: 1px solid #eef2f5;
+  color: #5c6770;
+}
+
+/* צבעי שורות כמו בדף הבית */
+
+.row-color-0 {
+  background: #f1f8ff;
+}
+
+.row-color-1 {
+  background: #fff4e5;
+}
+
+.row-color-2 {
+  background: #eaf8ed;
+}
+
+.row-color-3 {
+  background: #e9f7fd;
+}
+
+.row-color-4 {
+  background: #f4ecff;
+}
+
+/* hover יפה */
+
+tr:hover {
+  filter: brightness(0.97);
+  transition: 0.2s;
+}
+
+/* כפתורים */
+
+button {
+  border: none;
+  padding: 6px 14px;
+  margin-left: 6px;
+  border-radius: 18px;
+  font-size: 0.9rem;
+  cursor: pointer;
+  font-weight: 600;
+}
+
+button:first-child {
+  background: #e9f7fd;
+  color: #54bdd0;
+}
+
+button:last-child {
+  background: #fff4e5;
+  color: #d9902f;
+}
+
+button:hover {
+  transform: translateY(-1px);
+}
