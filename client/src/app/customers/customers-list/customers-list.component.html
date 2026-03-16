@@ -34,19 +34,4 @@
       (editClick)="editCustomer($event)">
     </app-generic-list>
   </section>
-
-  <ng-container *ngIf="formMode">
-    <section class="customers-form-card">
-      <app-generic-form
-        [title]="formMode === 'new' ? 'לקוח חדש' : formMode === 'view' ? 'צפייה בלקוח' : 'ערוך לקוח'"
-        [fields]="formFields"
-        [data]="selectedCustomer"
-        [procedureName]="formProcedureName"
-        [mode]="formMode"
-        (saved)="onFormSaved($event)"
-        (canceled)="onFormCanceled()"
-        (edit)="editCustomer(selectedCustomer)">
-      </app-generic-form>
-    </section>
-  </ng-container>
 </section>

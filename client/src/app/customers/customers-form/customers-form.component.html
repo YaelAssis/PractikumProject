@@ -1,0 +1,28 @@
+<section class="customers-page" dir="rtl">
+  <header class="customers-page__header" style="text-align: right;">
+    <div class="customers-page__title-block">
+      <span class="customers-page__eyebrow">CRM SYSTEM</span>
+      <h1>{{ mode === 'new' ? 'לקוח חדש' : mode === 'view' ? 'צפייה בלקוח' : 'ערוך לקוח' }}</h1>
+      <p>
+        ניהול לקוח בקובץ נפרד. כאן אפשר לשמור או לחזור לרשימת לקוחות.
+      </p>
+    </div>
+
+    <button type="button" class="customers-page__add-btn" (click)="onFormCanceled()">
+      חזרה לרשימה
+    </button>
+  </header>
+
+  <section class="customers-form-card">
+    <app-generic-form
+      [title]="mode === 'new' ? 'לקוח חדש' : mode === 'view' ? 'צפייה בלקוח' : 'ערוך לקוח'"
+      [fields]="formFields"
+      [data]="customer"
+      [procedureName]="formProcedureName"
+      [mode]="mode"
+      (saved)="onFormSaved($event)"
+      (canceled)="onFormCanceled()"
+      (edit)="onStartEdit()"
+    ></app-generic-form>
+  </section>
+</section>

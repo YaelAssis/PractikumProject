@@ -1,13 +1,18 @@
 table {
+  direction: rtl;
   width: 100%;
   border-collapse: collapse;
   margin-top: 1rem;
   font-family: Arial, Helvetica, sans-serif;
+  box-shadow: 0 10px 25px rgba(15, 49, 79, 0.08);
+  border-radius: 10px;
+  overflow: hidden;
 }
 
 h2 {
-  color: #73b6df;
+  color: #0f5fa5;
   margin-bottom: 1rem;
+  font-weight: 700;
 }
 
 th {

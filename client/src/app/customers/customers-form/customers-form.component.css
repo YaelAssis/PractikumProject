@@ -1,0 +1,5 @@
+.customers-page { padding: 1rem; }
+.customers-page__header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; }
+.customers-page__title-block h1 { margin: 0.2rem 0; }
+.customers-page__add-btn { cursor: pointer; }
+.customers-form-card { background: #fff; padding: 1rem; border: 1px solid #ddd; border-radius: 8px; }

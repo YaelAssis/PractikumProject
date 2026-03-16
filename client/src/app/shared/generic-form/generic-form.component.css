@@ -1,0 +1,83 @@
+.generic-form {
+  direction: rtl;
+  text-align: right;
+  display: grid;
+  gap: 1rem;
+  background: linear-gradient(135deg, #e2f7ff 0%, #fafafa 100%);
+  border: 1px solid #dceefb;
+  border-radius: 10px;
+  padding: 1rem;
+}
+
+.generic-form h2 {
+  font-size: 1.5rem;
+  margin: 0 0 0.8rem;
+  color: #1a73e8;
+  letter-spacing: 0.5px;
+}
+
+.generic-form__field {
+  display: grid;
+  grid-template-columns: 140px 1fr;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.generic-form__field label {
+  font-weight: 600;
+}
+
+.generic-form__field input,
+.generic-form__field select {
+  width: 100%;
+  padding: 0.5rem;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  font-size: 0.95rem;
+  background-color: #fff;
+}
+
+.generic-form__field input[readonly] {
+  background-color: #f9f9f9;
+  border-color: #ddd;
+  color: #666;
+}
+
+.generic-form__actions {
+  display: flex;
+  gap: 0.75rem;
+  justify-content: flex-end;
+}
+
+.btn {
+  border: none;
+  border-radius: 6px;
+  padding: 0.65rem 1rem;
+  cursor: pointer;
+  font-weight: 600;
+}
+
+.btn-primary {
+  background-color: #0d6efd;
+  color: #fff;
+}
+
+.btn-secondary {
+  background-color: #f8f9fa;
+  color: #212529;
+  border: 1px solid #dee2e6;
+}
+
+.btn-tertiary {
+  background-color: #fff;
+  color: #0d6efd;
+  border: 1px solid #0d6efd;
+}
+
+.btn:hover {
+  opacity: 0.93;
+}
+
+.btn:active {
+  transform: translateY(1px);
+}

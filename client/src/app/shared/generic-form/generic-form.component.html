@@ -1,8 +1,8 @@
-<h2>{{title}}</h2>
+<h2>{{ title }}</h2>
 
-<form [formGroup]="form">
-  <div *ngFor="let field of fields">
-    <label>{{field.label}}</label>
+<form [formGroup]="form" class="generic-form">
+  <div *ngFor="let field of fields" class="generic-form__field">
+    <label>{{ field.label }}</label>
 
     <ng-container *ngIf="field.type === 'select'; else textField">
       <select [formControlName]="field.key">
@@ -14,15 +14,13 @@
     </ng-container>
 
     <ng-template #textField>
-      <input
-        [formControlName]="field.key"
-        type="text">
+      <input [formControlName]="field.key" type="text" [readOnly]="mode === 'view'" />
     </ng-template>
   </div>
 
-  <div style="margin-top: 1rem; display: flex; gap: 1rem;">
-    <button type="button" (click)="save()" [hidden]="mode === 'view'">Save</button>
-    <button type="button" (click)="cancel()">Cancel</button>
-    <button type="button" (click)="startEdit()" *ngIf="mode === 'view'">Edit</button>
+  <div class="generic-form__actions">
+    <button class="btn btn-primary" type="button" (click)="save()" [hidden]="mode === 'view'">שמור</button>
+    <button class="btn btn-secondary" type="button" (click)="cancel()">חזור</button>
+    <button class="btn btn-tertiary" type="button" (click)="startEdit()" *ngIf="mode === 'view'">ערוך</button>
   </div>
 </form>

@@ -2,14 +2,14 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { catchError, map, Observable, of } from 'rxjs';
+import { Router } from '@angular/router';
 import { ApiService } from '../../services/api.service';
 import { GenericListComponent } from '../../shared/generic-list/generic-list.component';
-import { GenericFormComponent } from '../../shared/generic-form/generic-form.component';
 
 @Component({
   selector: 'app-customers-list',
   standalone: true,
-  imports: [CommonModule, FormsModule, GenericListComponent, GenericFormComponent],
+  imports: [CommonModule, FormsModule, GenericListComponent],
   templateUrl: './customers-list.component.html',
   styleUrls: ['./customers-list.component.css']
 })
@@ -20,7 +20,7 @@ export class CustomersListComponent implements OnInit {
   cityOptions: Array<{ value: any; label: string }> = [];
   statusOptions: Array<{ value: any; label: string }> = [];
 
-  columns = [
+  columns: Array<{ key: string; label: string }> = [
     { key: 'Id', label: 'מזהה' },
     { key: 'FullName', label: 'שם מלא' },
     { key: 'Phone', label: 'טלפון' },
@@ -29,51 +29,11 @@ export class CustomersListComponent implements OnInit {
     { key: 'StatusName', label: 'סטטוס' }
   ];
 
-  formMode: 'view' | 'edit' | 'new' | null = null;
-  selectedCustomer: any = null;
-
-  detailFields = [
-    { key: 'Id', label: 'מזהה' },
-    { key: 'FullName', label: 'שם מלא' },
-    { key: 'Phone', label: 'טלפון' },
-    { key: 'Email', label: 'אימייל' },
-    { key: 'CityName', label: 'עיר' },
-    { key: 'StatusName', label: 'סטטוס' }
-  ];
-
-  editFields = [
-    { key: 'FullName', label: 'שם מלא', required: true },
-    { key: 'Phone', label: 'טלפון' },
-    { key: 'Email', label: 'אימייל' },
-    { key: 'CityId', label: 'עיר', type: 'select', options: this.cityOptions, required: true },
-    { key: 'StatusId', label: 'סטטוס', type: 'select', options: this.statusOptions, required: true }
-  ];
-
-  constructor(private api: ApiService) {}
+  constructor(private api: ApiService, private router: Router) {}
 
   ngOnInit(): void {
     this.loadLookups();
     this.loadCustomers();
-  }
-
-  get formFields() {
-    if (this.formMode === 'view') {
-      return this.detailFields;
-    }
-
-    return this.editFields;
-  }
-
-  private updateEditFieldOptions(): void {
-    const cityField = this.editFields.find((field: any) => field.key === 'CityId');
-    if (cityField) {
-      cityField.options = this.cityOptions;
-    }
-
-    const statusField = this.editFields.find((field: any) => field.key === 'StatusId');
-    if (statusField) {
-      statusField.options = this.statusOptions;
-    }
   }
 
   private normalizeResultSet(data: any): any[] {
@@ -114,18 +74,16 @@ export class CustomersListComponent implements OnInit {
   loadLookups() {
     this.loadLookupWithFallback(['Cities_GetAll', 'City_GetAll']).subscribe((cities: any[]) => {
       this.cityOptions = this.mapOptions(cities, ['Id', 'CityId'], ['Name', 'CityName', 'Title']);
-      this.updateEditFieldOptions();
     });
 
     this.loadLookupWithFallback(['CustomerStatuses_GetAll', 'CustomerStatus_GetAll']).subscribe((statuses: any[]) => {
       this.statusOptions = this.mapOptions(statuses, ['Id', 'StatusId'], ['Name', 'StatusName', 'Title']);
-      this.updateEditFieldOptions();
     });
   }
 
   loadCustomers() {
     // שלחתי מחרוזת ריקה במקום null כדי שהחיפוש יעבוד תמיד
-    this.api.execute('Customers_GetAll', { Search: '' }) 
+    this.api.execute('Customers_GetAll', { Search: '' })
       .subscribe((data: any) => {
         this.customers = this.normalizeResultSet(data);
       });
@@ -146,63 +104,16 @@ export class CustomersListComponent implements OnInit {
     });
   }
 
-  get formProcedureName(): string {
-    return this.formMode === 'edit' ? 'Customers_Update' : 'Customers_Create';
-  }
-
-  private mapNameToId(name: string | undefined, options: Array<{ value: any; label: string }>): any {
-    if (!name) {
-      return null;
-    }
-
-    const match = options.find((option) => option.label === name);
-    return match ? match.value : null;
-  }
-
-  private prepareCustomerForEdit(customer: any): any {
-    const customerForEdit = { ...customer };
-
-    if (customerForEdit.CityId === undefined || customerForEdit.CityId === null) {
-      customerForEdit.CityId = this.mapNameToId(customerForEdit.CityName, this.cityOptions);
-    }
-
-    if (customerForEdit.StatusId === undefined || customerForEdit.StatusId === null) {
-      customerForEdit.StatusId = this.mapNameToId(customerForEdit.StatusName, this.statusOptions);
-    }
-
-    return customerForEdit;
-  }
-
   addCustomer() {
-    this.selectedCustomer = {
-      FullName: '',
-      Phone: '',
-      Email: '',
-      CityId: null,
-      StatusId: null
-    };
-    this.formMode = 'new';
+    this.router.navigate(['/customers/new']);
   }
 
   viewCustomer(customer: any) {
-    this.selectedCustomer = { ...customer };
-    this.formMode = 'view';
+    this.router.navigate(['/customers', customer.Id, 'view']);
   }
 
   editCustomer(customer: any) {
-    this.selectedCustomer = this.prepareCustomerForEdit(customer);
-    this.formMode = 'edit';
-  }
-
-  onFormSaved(event: any) {
-    // event contains { mode, data, result } from GenericFormComponent
-    this.loadCustomers();
-    this.formMode = null;
-    this.selectedCustomer = null;
-  }
-
-  onFormCanceled() {
-    this.formMode = null;
-    this.selectedCustomer = null;
+    this.router.navigate(['/customers', customer.Id, 'edit']);
   }
 }
+
