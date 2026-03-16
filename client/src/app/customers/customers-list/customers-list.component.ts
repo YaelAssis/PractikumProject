@@ -1,7 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { catchError, map, Observable, of } from 'rxjs';
 import { Router } from '@angular/router';
 import { ApiService } from '../../services/api.service';
 import { GenericListComponent } from '../../shared/generic-list/generic-list.component';
@@ -17,8 +16,6 @@ export class CustomersListComponent implements OnInit {
 
   customers: any[] = [];
   searchText: string = '';
-  cityOptions: Array<{ value: any; label: string }> = [];
-  statusOptions: Array<{ value: any; label: string }> = [];
 
   columns: Array<{ key: string; label: string }> = [
     { key: 'Id', label: 'מזהה' },
@@ -32,7 +29,6 @@ export class CustomersListComponent implements OnInit {
   constructor(private api: ApiService, private router: Router) {}
 
   ngOnInit(): void {
-    this.loadLookups();
     this.loadCustomers();
   }
 
@@ -48,41 +44,7 @@ export class CustomersListComponent implements OnInit {
     return [];
   }
 
-  private loadLookupWithFallback(procedureNames: string[]): Observable<any[]> {
-    if (!procedureNames.length) {
-      return of([]);
-    }
-
-    const [currentProcedure, ...restProcedures] = procedureNames;
-
-    return this.api.execute(currentProcedure, {}).pipe(
-      map((data: any) => this.normalizeResultSet(data)),
-      catchError(() => this.loadLookupWithFallback(restProcedures))
-    );
-  }
-
-  private mapOptions(items: any[], idCandidates: string[], nameCandidates: string[]): Array<{ value: any; label: string }> {
-    return items
-      .map((item: any) => {
-        const valueKey = idCandidates.find((key) => item[key] !== undefined && item[key] !== null) || 'Id';
-        const labelKey = nameCandidates.find((key) => item[key] !== undefined && item[key] !== null) || 'Name';
-        return { value: item[valueKey], label: String(item[labelKey] ?? item[valueKey] ?? '') };
-      })
-      .filter((option) => option.value !== undefined && option.value !== null && option.label !== '');
-  }
-
-  loadLookups() {
-    this.loadLookupWithFallback(['Cities_GetAll', 'City_GetAll']).subscribe((cities: any[]) => {
-      this.cityOptions = this.mapOptions(cities, ['Id', 'CityId'], ['Name', 'CityName', 'Title']);
-    });
-
-    this.loadLookupWithFallback(['CustomerStatuses_GetAll', 'CustomerStatus_GetAll']).subscribe((statuses: any[]) => {
-      this.statusOptions = this.mapOptions(statuses, ['Id', 'StatusId'], ['Name', 'StatusName', 'Title']);
-    });
-  }
-
   loadCustomers() {
-    // שלחתי מחרוזת ריקה במקום null כדי שהחיפוש יעבוד תמיד
     this.api.execute('Customers_GetAll', { Search: '' })
       .subscribe((data: any) => {
         this.customers = this.normalizeResultSet(data);
@@ -90,6 +52,7 @@ export class CustomersListComponent implements OnInit {
   }
 
   get filteredCustomers(): any[] {
+
     const query = this.searchText.trim().toLowerCase();
 
     if (!query) {
@@ -97,10 +60,24 @@ export class CustomersListComponent implements OnInit {
     }
 
     return this.customers.filter((customer: any) => {
-      const nameValue = (customer.Name ?? customer.FullName ?? '').toString().toLowerCase();
-      const titleValue = (customer.Title ?? '').toString().toLowerCase();
 
-      return nameValue.includes(query) || titleValue.includes(query);
+      const nameValue = (customer.FullName ?? customer.Name ?? '')
+        .toString()
+        .toLowerCase();
+
+      const phoneValue = (customer.Phone ?? '')
+        .toString()
+        .toLowerCase();
+
+      const emailValue = (customer.Email ?? '')
+        .toString()
+        .toLowerCase();
+
+      return (
+        nameValue.includes(query) ||
+        phoneValue.includes(query) ||
+        emailValue.includes(query)
+      );
     });
   }
 
@@ -115,5 +92,5 @@ export class CustomersListComponent implements OnInit {
   editCustomer(customer: any) {
     this.router.navigate(['/customers', customer.Id, 'edit']);
   }
-}
 
+}

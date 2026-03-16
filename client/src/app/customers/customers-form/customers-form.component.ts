@@ -13,6 +13,7 @@ import { GenericFormComponent } from '../../shared/generic-form/generic-form.com
   styleUrls: ['./customers-form.component.css']
 })
 export class CustomersFormComponent implements OnInit {
+
   mode: 'new' | 'edit' | 'view' = 'new';
   customer: any = {};
 
@@ -43,6 +44,7 @@ export class CustomersFormComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
+
     this.loadLookups();
 
     const id = this.route.snapshot.paramMap.get('id');
@@ -54,6 +56,7 @@ export class CustomersFormComponent implements OnInit {
     }
 
     const currentUrl = this.router.url.toLowerCase();
+
     if (currentUrl.includes('/edit')) {
       this.mode = 'edit';
     } else if (currentUrl.includes('/view')) {
@@ -72,6 +75,7 @@ export class CustomersFormComponent implements OnInit {
   }
 
   private normalizeResultSet(data: any): any[] {
+
     if (Array.isArray(data)) {
       return data;
     }
@@ -83,57 +87,95 @@ export class CustomersFormComponent implements OnInit {
     return [];
   }
 
-  private loadLookupWithFallback(procedureNames: string[]): Observable<any[]> {
-    if (!procedureNames.length) {
-      return of([]);
-    }
+  private loadLookup(procedureName: string): Observable<any[]> {
 
-    const [currentProcedure, ...restProcedures] = procedureNames;
-
-    return this.api.execute(currentProcedure, {}).pipe(
+    return this.api.execute(procedureName, {}).pipe(
       map((data: any) => this.normalizeResultSet(data)),
-      catchError(() => this.loadLookupWithFallback(restProcedures))
+      catchError(() => of([]))
     );
   }
 
-  private mapOptions(items: any[], idCandidates: string[], nameCandidates: string[]): Array<{ value: any; label: string }> {
+  private mapOptions(
+    items: any[],
+    idCandidates: string[],
+    nameCandidates: string[]
+  ): Array<{ value: any; label: string }> {
+
     return items
       .map((item: any) => {
-        const valueKey = idCandidates.find((key) => item[key] !== undefined && item[key] !== null) || 'Id';
-        const labelKey = nameCandidates.find((key) => item[key] !== undefined && item[key] !== null) || 'Name';
-        return { value: item[valueKey], label: String(item[labelKey] ?? item[valueKey] ?? '') };
+
+        const valueKey =
+          idCandidates.find((key) => item[key] !== undefined && item[key] !== null) || 'Id';
+
+        const labelKey =
+          nameCandidates.find((key) => item[key] !== undefined && item[key] !== null) || 'Name';
+
+        return {
+          value: item[valueKey],
+          label: String(item[labelKey] ?? item[valueKey] ?? '')
+        };
       })
-      .filter((option) => option.value !== undefined && option.value !== null && option.label !== '');
+      .filter(
+        (option) =>
+          option.value !== undefined &&
+          option.value !== null &&
+          option.label !== ''
+      );
   }
 
   private updateEditFieldOptions(): void {
+
     const cityField = this.editFields.find((field: any) => field.key === 'CityId');
+
     if (cityField) {
       cityField.options = this.cityOptions;
     }
 
     const statusField = this.editFields.find((field: any) => field.key === 'StatusId');
+
     if (statusField) {
       statusField.options = this.statusOptions;
     }
   }
 
-  loadLookups() {
-    this.loadLookupWithFallback(['Cities_GetAll', 'City_GetAll']).subscribe((cities: any[]) => {
-      this.cityOptions = this.mapOptions(cities, ['Id', 'CityId'], ['Name', 'CityName', 'Title']);
-      this.updateEditFieldOptions();
-    });
+  private loadOptions(procedureName: string, target: 'city' | 'status') {
 
-    this.loadLookupWithFallback(['CustomerStatuses_GetAll', 'CustomerStatus_GetAll']).subscribe((statuses: any[]) => {
-      this.statusOptions = this.mapOptions(statuses, ['Id', 'StatusId'], ['Name', 'StatusName', 'Title']);
+    this.loadLookup(procedureName).subscribe((items: any[]) => {
+
+      const options = this.mapOptions(
+        items,
+        ['Id', 'CityId', 'StatusId'],
+        ['Name', 'CityName', 'StatusName', 'Title']
+      );
+
+      if (target === 'city') {
+        this.cityOptions = options;
+      }
+
+      if (target === 'status') {
+        this.statusOptions = options;
+      }
+
       this.updateEditFieldOptions();
     });
   }
 
+  loadLookups() {
+
+    this.loadOptions('Cities_GetAll', 'city');
+    this.loadOptions('CustomerStatuses_GetAll', 'status');
+
+  }
+
   private loadCustomerById(id: number) {
+
     this.api.execute('Customers_GetAll', { Search: '' }).subscribe((data: any) => {
+
       const customers = this.normalizeResultSet(data);
-      const found = customers.find((item: any) => item.Id === id || item.CustomerId === id);
+
+      const found = customers.find(
+        (item: any) => item.Id === id || item.CustomerId === id
+      );
 
       if (!found) {
         this.router.navigate(['/customers']);
@@ -153,8 +195,10 @@ export class CustomersFormComponent implements OnInit {
   }
 
   onStartEdit() {
+
     if (this.customer?.Id) {
       this.router.navigate(['/customers', this.customer.Id, 'edit']);
     }
   }
+
 }
